@@ -1,19 +1,24 @@
 import { sleep } from "bun";
 import { jobs } from ".";
+import { readFile } from "./storage";
 
 export const worker1 = async(jobId : string) => {
     console.log("worker started");
-    const job = jobs.get(jobId)!;
+    // const job = jobs.get(jobId)!;
+    const file = await readFile(jobId);
+    
+    console.log(file);
+    // console.log(await file.json()) 
 
-    job.status = "running"
+    // job.status = "running"
 
     await sleep(5000);
-    job.progress = 50
+    // job.progress = 50
 
     await sleep(3000);
-    job.progress = 100
+    // job.progress = 100
 
-    job.status = "completed"
+    // job.status = "completed"
 
     // await new Promise((r) => {
     //     setTimeout(() => {
