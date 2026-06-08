@@ -29,6 +29,7 @@ app.get("/jobs/:jobid", async (c) => {
 
 })
 
+
 app.post("/start", async(c) => {
     const jobId = crypto.randomUUID();
 
@@ -57,4 +58,4 @@ Bun.serve({
   fetch: app.fetch,
 });
 
-console.log(`server running on http://localhost:${3000}`);
+console.log(`server running on http://localhost:${3000}`,);
