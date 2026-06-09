@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { worker1, type Job } from "./workers";
-import { createFile, readFile } from "./storage";
+import { readFile, writeFile } from "./storage";
 
 const app = new Hono();
 
@@ -42,7 +42,7 @@ app.post("/start", async(c) => {
         progress: 0,
         message: "",
     }
-    await createFile(job);
+    await writeFile(job);
 
     // jobs.set(jobId, {
     //     id: jobId,

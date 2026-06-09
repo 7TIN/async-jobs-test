@@ -23,7 +23,7 @@ await Bun.write(path, JSON.stringify(data, null, 2));
 // console.log(await file.text())
 // console.log(storageDir);
 
-export const createFile = async (job: Job) => {
+export const writeFile = async (job: Job) => {
   const path = `${rootDir}/storage/jobs_${job.id}.json`;
   await Bun.write(path, JSON.stringify(job, null, 2));
 };

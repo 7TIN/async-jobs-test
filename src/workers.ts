@@ -1,40 +1,48 @@
-import { sleep } from "bun";
+import { sleep, write } from "bun";
 import { jobs } from ".";
-import { readFile } from "./storage";
+import { readFile, writeFile } from "./storage";
 
-export const worker1 = async(jobId : string) => {
-    console.log("worker started");
-    // const job = jobs.get(jobId)!;
-    const file = await readFile(jobId);
-    
-    console.log(file);
-    // console.log(await file.json()) 
+export const worker1 = async (jobId: string) => {
+  console.log("worker started");
+  // const job = jobs.get(jobId)!;
+  const file : Job = await readFile(jobId)!;
 
-    // job.status = "running"
+  console.log(file);
+  // console.log(await file.json())
 
-    await sleep(5000);
-    // job.progress = 50
+  file.status = "running";
+  await writeFile(file);
+  // job.status = "running"
 
-    await sleep(3000);
-    // job.progress = 100
+  await sleep(9999);
+  // job.progress = 50
+  file.progress = 50;
+  await writeFile(file);
 
-    // job.status = "completed"
+  await sleep(9999);
+  file.progress = 100;
+  // job.progress = 100
+  file.status = "completed";
 
-    // await new Promise((r) => {
-    //     setTimeout(() => {
-    //         console.log("hello")
-    //     }, 5000)
-    //     // setTimeout(r,5000);
-    // })
-}
+  await writeFile(file);
 
-export const worker2 = async() => {
-    console.log("worker");
-}
+  // job.status = "completed"
+
+  // await new Promise((r) => {
+  //     setTimeout(() => {
+  //         console.log("hello")
+  //     }, 5000)
+  //     // setTimeout(r,5000);
+  // })
+};
+
+export const worker2 = async () => {
+  console.log("worker");
+};
 
 export type Job = {
-    id : string;
-    status : "running" | "queued" | "failure" | "completed";
-    progress : number;
-    message : string;
-}
+  id: string;
+  status: "running" | "queued" | "failure" | "completed";
+  progress: number;
+  message: string;
+};
