@@ -1,6 +1,7 @@
 import { Hono } from "hono";
-import { worker1, type Job } from "./workers";
+import { worker, type Job } from "./workers";
 import { readFile, writeFile } from "./storage";
+import { sleep } from "bun";
 
 const app = new Hono();
 
@@ -19,49 +20,59 @@ app.get("/", (c) =>
 // })
 
 app.get("/jobs/:jobid", async (c) => {
-    const jobId = c.req.param("jobid");
-    console.log(jobId)
+  const jobId = c.req.param("jobid");
+  console.log(jobId);
 
-    // const job = jobs.get(jobId)
-    const jobData = await readFile(jobId);
+  // const job = jobs.get(jobId)
+  const jobData = await readFile(jobId);
 
-    return c.json({
-        status : 200,
-        jobDetails : jobData
-    });
+  return c.json({
+    status: 200,
+    jobDetails: jobData,
+  });
+});
 
-})
+app.get("/stress-read/:jobId", async (c) => {
+  try {
+    const jobId = c.req.param("jobId");
 
-
-app.post("/start", async(c) => {
-    const jobId = crypto.randomUUID();
-
-    const job : Job = {
-        id: jobId,
-        status: "queued",
-        progress: 0,
-        message: "",
+    for (let i = 0; i < 100; i++) {
+      await sleep(50);
+      const job = await readFile(jobId);
+      console.log("ok", job.progress);
     }
-    await writeFile(job);
+  } catch (err) {
+    console.log(err);
+  }
+});
 
-    // jobs.set(jobId, {
-    //     id: jobId,
-    //     status: "queued",
-    //     progress: 0,
-    //     message: "",
-    // })
+app.post("/start", async (c) => {
+  const jobId = crypto.randomUUID();
 
-    void worker1(jobId);
+  const job: Job = {
+    id: jobId,
+    status: "queued",
+    progress: 0,
+    message: "",
+  };
+  await writeFile(job);
 
-    return c.json({
-        jobId : jobId
-    })
-})
+  // jobs.set(jobId, {
+  //     id: jobId,
+  //     status: "queued",
+  //     progress: 0,
+  //     message: "",
+  // })
+
+  void worker(jobId);
+
+  return c.json({
+    jobId: jobId,
+  });
+});
 
 app.get("/call", async (c) => {
-
-  await Promise.all([worker1("1"), worker1("2"), worker1("3")]);
-
+  await Promise.all([worker("1"), worker("2"), worker("3")]);
 });
 
 Bun.serve({
@@ -69,4 +80,4 @@ Bun.serve({
   fetch: app.fetch,
 });
 
-console.log(`server running on http://localhost:${3000}`,);
+console.log(`server running on http://localhost:${3000}`);

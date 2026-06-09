@@ -4,40 +4,43 @@ import { readFile, writeFile } from "./storage";
 
 export const worker1 = async (jobId: string) => {
   console.log("worker started");
-  // const job = jobs.get(jobId)!;
-  const file : Job = await readFile(jobId)!;
+  const file: Job = await readFile(jobId)!;
 
   console.log(file);
-  // console.log(await file.json())
 
   file.status = "running";
   await writeFile(file);
-  // job.status = "running"
 
-  await sleep(9999);
-  // job.progress = 50
+  await sleep(1000);
   file.progress = 50;
   await writeFile(file);
 
-  await sleep(9999);
+  await sleep(1000);
   file.progress = 100;
-  // job.progress = 100
+
   file.status = "completed";
-
   await writeFile(file);
-
-  // job.status = "completed"
-
-  // await new Promise((r) => {
-  //     setTimeout(() => {
-  //         console.log("hello")
-  //     }, 5000)
-  //     // setTimeout(r,5000);
-  // })
 };
 
-export const worker2 = async () => {
-  console.log("worker");
+export const worker = async (jobid: string) => {
+  const job: Job = await readFile(jobid);
+
+  job.status = "running";
+  await writeFile(job);
+  const totalFrames = 100;
+
+  for (let frame = 1; frame <= totalFrames; frame++) {
+    await sleep(1000);
+
+    job.progress = Math.floor((frame / totalFrames) * 100);
+
+    await writeFile(job);
+  }
+
+  job.status = "completed";
+  await writeFile(job);
+
+//   console.log("worker");
 };
 
 export type Job = {
